@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package device;
+
+option go_package = "internal/api/grpc/proto;proto";
+
+service DeviceService {
+  rpc GetInfo (Empty) returns (DeviceInfo);
+}
+
+message Empty {}
+
+message DeviceInfo {
+  string id = 1;
+  string name = 2;
+  string hardware_version = 3;
+  string software_version = 4;
+  string firmware_version = 5;
+}

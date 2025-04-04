@@ -1,3 +1,13 @@
+# Make
+* make proto
+* binary:
+* * make build-macos-arm
+* * make build-macos-intel
+* * make build-linux
+* * make build-windows
+* make clean
+* make docker
+
 # PoC Steps:
 1. The initial service architecture and component layout were drafted. I formulated and submitted questions to clarify unclear aspects from the original request. Started sketching out device interaction logic.
 2. Completed the device interaction sketches. Documented how to run them so they can be tested with real devices on-site. Received critical feedback on the initial architecture and partial answers to the submitted questions.
