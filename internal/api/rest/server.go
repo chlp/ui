@@ -2,16 +2,21 @@ package rest
 
 import (
 	"encoding/json"
-	"github.com/chlp/ui/internal/data"
+	"github.com/chlp/ui/internal/config"
 	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/pkg/file_store"
 	"github.com/chlp/ui/pkg/logger"
 	"net/http"
 	"sync"
 )
 
-func StartRestServer(deviceConfig *model.DeviceInfo, devicesMu *sync.Mutex, devices *[]string, devicesFile string, restPort string) {
+func StartRestServer(cfg *config.Config) {
+	if cfg.RestPort == "" {
+		return
+	}
+
 	http.HandleFunc("/info", func(w http.ResponseWriter, r *http.Request) {
-		_ = json.NewEncoder(w).Encode(deviceConfig)
+		_ = json.NewEncoder(w).Encode(cfg.Device)
 	})
 
 	http.HandleFunc("/devices", func(w http.ResponseWriter, r *http.Request) {
@@ -70,12 +75,14 @@ func StartRestServer(deviceConfig *model.DeviceInfo, devicesMu *sync.Mutex, devi
 		w.WriteHeader(http.StatusOK)
 	})
 
-	logger.Printf("Starting REST server on %s", restPort)
-	_ = http.ListenAndServe(restPort, nil)
+	logger.Printf("StartRestServer: starting server on %s", cfg.RestPort)
+	if err := http.ListenAndServe(cfg.RestPort, nil); err != nil {
+		logger.Fatalf("StartRestServer: failed to serve: %v", err)
+	}
 }
 
 func saveDevices(devicesMu *sync.Mutex, devices *[]string, devicesFile string) error {
 	devicesMu.Lock()
 	defer devicesMu.Unlock()
-	return data.SaveJSON(devicesFile, &devices)
+	return file_store.SaveJSON(devicesFile, &devices)
 }
