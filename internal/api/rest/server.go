@@ -5,6 +5,7 @@ import (
 	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"net/http"
+	"reflect"
 )
 
 type server struct {
@@ -27,7 +28,7 @@ func StartServer(app *application.App, port string, device *device.Info, monitor
 
 	mux.HandleFunc("/v1/info", s.getInfoHandler)
 
-	if s.monitor != nil {
+	if s.monitor != nil && !reflect.ValueOf(s.monitor).IsNil() {
 		mux.HandleFunc("/v1/devices_status", s.getDevicesStatusHandler)
 		mux.HandleFunc("/v1/devices", s.getDevicesListHandler)
 		mux.HandleFunc("/v1/device", s.deviceHandler)

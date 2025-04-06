@@ -5,6 +5,7 @@ import (
 	"github.com/chlp/ui/internal/device"
 	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
+	"reflect"
 	"sync"
 )
 
@@ -34,11 +35,11 @@ func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store
 		logger.Printf("Monitor: err %v", err)
 		return nil, err
 	}
-	if devicesListStore == nil {
+	if devicesListStore == nil || reflect.ValueOf(devicesListStore).IsNil() {
 		logger.Printf("Monitor: starting without monitor (no devicesListStore)")
 		return nil, nil
 	}
-	if devicesStatusStore == nil {
+	if devicesStatusStore == nil || reflect.ValueOf(devicesStatusStore).IsNil() {
 		logger.Printf("Monitor: starting without monitor (no devicesStatusStore)")
 		return nil, nil
 	}
