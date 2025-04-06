@@ -13,8 +13,8 @@ type Monitor struct {
 
 	devicesStatusStore Store
 
-	devicesStatusInfo   map[string]model.DeviceStatusInfo
-	devicesStatusInfoMu sync.Mutex
+	devicesStatus   map[string]model.DeviceStatus
+	devicesStatusMu sync.RWMutex
 }
 
 func MustNewMonitor(devicesListStore, devicesStatusStore Store) *Monitor {
@@ -32,12 +32,12 @@ func NewMonitor(devicesListStore, devicesStatusStore Store) (*Monitor, error) {
 	}
 
 	m := &Monitor{
-		devicesList:         make([]string, 0),
-		devicesListStore:    devicesListStore,
-		devicesListMu:       sync.RWMutex{},
-		devicesStatusStore:  devicesStatusStore,
-		devicesStatusInfo:   make(map[string]model.DeviceStatusInfo),
-		devicesStatusInfoMu: sync.Mutex{},
+		devicesList:        make([]string, 0),
+		devicesListStore:   devicesListStore,
+		devicesListMu:      sync.RWMutex{},
+		devicesStatusStore: devicesStatusStore,
+		devicesStatus:      make(map[string]model.DeviceStatus),
+		devicesStatusMu:    sync.RWMutex{},
 	}
 
 	if err := m.syncDevicesListWithStore(); err != nil {
@@ -48,4 +48,15 @@ func NewMonitor(devicesListStore, devicesStatusStore Store) (*Monitor, error) {
 	go m.pollAllDevicesStatus()
 
 	return m, nil
+}
+
+func (m *Monitor) GetDevicesStatus() map[string]model.DeviceStatus {
+	m.devicesStatusMu.RLock()
+	defer m.devicesStatusMu.RUnlock()
+
+	devicesStatus := make(map[string]model.DeviceStatus, len(m.devicesStatus))
+	for k, v := range m.devicesStatus {
+		devicesStatus[k] = v
+	}
+	return devicesStatus
 }

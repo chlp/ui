@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/chlp/ui/internal/model"
-	"github.com/chlp/ui/pkg/file_store"
+	"github.com/chlp/ui/pkg/filestore"
 	"github.com/chlp/ui/pkg/logger"
 	"os"
 	"time"
@@ -55,9 +55,9 @@ func LoadOrCreateConfig(configFile string) (*Config, error) {
 			RestPort:          defaultRestPort,
 			Device:            deviceConfig,
 		}
-		return cfg, file_store.SaveJSON(configFile, cfg)
+		return cfg, filestore.SaveJSON(configFile, cfg)
 	} else {
-		if err = file_store.LoadJSON(configFile, &cfg); err != nil {
+		if err = filestore.LoadJSON(configFile, &cfg); err != nil {
 			return nil, err
 		}
 		return cfg, nil

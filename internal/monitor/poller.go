@@ -8,18 +8,15 @@ import (
 )
 
 const (
-	devicesStatusInfoPollInterval = 5 * time.Second
-	maxParallelPolling            = 128
+	devicesStatusPollInterval = 5 * time.Second
+	maxParallelPolling        = 128
 )
 
 func (m *Monitor) pollAllDevicesStatus() {
-	ticker := time.NewTicker(devicesStatusInfoPollInterval)
+	ticker := time.NewTicker(devicesStatusPollInterval)
 	defer ticker.Stop()
 	for range ticker.C {
-		m.devicesListMu.RLock()
-		devicesList := make([]string, len(m.devicesList))
-		copy(devicesList, m.devicesList)
-		m.devicesListMu.RUnlock()
+		devicesList := m.GetDevicesList()
 
 		wg := sync.WaitGroup{}
 		semaphore := make(chan struct{}, maxParallelPolling)
@@ -57,14 +54,14 @@ func (m *Monitor) pollDeviceStatus(address string) error {
 		return nil
 	}
 
-	m.devicesStatusInfoMu.Lock()
-	m.devicesStatusInfo[address] = model.DeviceStatusInfo{
+	m.devicesStatusMu.Lock()
+	m.devicesStatus[address] = model.DeviceStatus{
 		DeviceInfo: *info,
 		UpdatedAt:  time.Now(),
 	}
-	m.devicesStatusInfoMu.Unlock()
+	m.devicesStatusMu.Unlock()
 
-	err = m.devicesStatusStore.SaveJSON(&m.devicesStatusInfo)
+	err = m.devicesStatusStore.SaveJSON(&m.devicesStatus)
 	if err != nil {
 		logger.Printf("Monitor::pollDevice: devicesStatusStore.SaveJSON (%s): %v", address, err)
 		return err

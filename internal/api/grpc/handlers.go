@@ -5,12 +5,13 @@ import (
 	"github.com/chlp/ui/internal/api/grpc/proto"
 )
 
-func (s *Server) GetInfo(ctx context.Context, in *proto.Empty) (*proto.DeviceInfo, error) {
+func (s *server) GetInfo(ctx context.Context, in *proto.Empty) (*proto.DeviceInfo, error) {
 	return &proto.DeviceInfo{
-		Id:              s.DeviceConfig.ID,
-		Name:            s.DeviceConfig.Name,
-		HardwareVersion: s.DeviceConfig.HardwareVersion,
-		SoftwareVersion: s.DeviceConfig.SoftwareVersion,
-		FirmwareVersion: s.DeviceConfig.FirmwareVersion,
+		Id:              s.device.ID,
+		HardwareVersion: s.device.HardwareVersion,
+		SoftwareVersion: s.device.SoftwareVersion,
+		FirmwareVersion: s.device.FirmwareVersion,
+		Status:          string(s.device.Status),
+		Checksum:        s.device.Checksum,
 	}, nil
 }

@@ -60,10 +60,11 @@ func (*Empty) Descriptor() ([]byte, []int) {
 type DeviceInfo struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name            string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	HardwareVersion string                 `protobuf:"bytes,3,opt,name=hardware_version,json=hardwareVersion,proto3" json:"hardware_version,omitempty"`
-	SoftwareVersion string                 `protobuf:"bytes,4,opt,name=software_version,json=softwareVersion,proto3" json:"software_version,omitempty"`
-	FirmwareVersion string                 `protobuf:"bytes,5,opt,name=firmware_version,json=firmwareVersion,proto3" json:"firmware_version,omitempty"`
+	HardwareVersion string                 `protobuf:"bytes,2,opt,name=hardware_version,json=hardwareVersion,proto3" json:"hardware_version,omitempty"`
+	SoftwareVersion string                 `protobuf:"bytes,3,opt,name=software_version,json=softwareVersion,proto3" json:"software_version,omitempty"`
+	FirmwareVersion string                 `protobuf:"bytes,4,opt,name=firmware_version,json=firmwareVersion,proto3" json:"firmware_version,omitempty"`
+	Status          string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	Checksum        string                 `protobuf:"bytes,6,opt,name=checksum,proto3" json:"checksum,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -105,13 +106,6 @@ func (x *DeviceInfo) GetId() string {
 	return ""
 }
 
-func (x *DeviceInfo) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
 func (x *DeviceInfo) GetHardwareVersion() string {
 	if x != nil {
 		return x.HardwareVersion
@@ -133,19 +127,34 @@ func (x *DeviceInfo) GetFirmwareVersion() string {
 	return ""
 }
 
+func (x *DeviceInfo) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *DeviceInfo) GetChecksum() string {
+	if x != nil {
+		return x.Checksum
+	}
+	return ""
+}
+
 var File_internal_api_grpc_proto_device_proto protoreflect.FileDescriptor
 
 const file_internal_api_grpc_proto_device_proto_rawDesc = "" +
 	"\n" +
 	"$internal/api/grpc/proto/device.proto\x12\x06device\"\a\n" +
-	"\x05Empty\"\xb1\x01\n" +
+	"\x05Empty\"\xd1\x01\n" +
 	"\n" +
 	"DeviceInfo\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
-	"\x10hardware_version\x18\x03 \x01(\tR\x0fhardwareVersion\x12)\n" +
-	"\x10software_version\x18\x04 \x01(\tR\x0fsoftwareVersion\x12)\n" +
-	"\x10firmware_version\x18\x05 \x01(\tR\x0ffirmwareVersion2=\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12)\n" +
+	"\x10hardware_version\x18\x02 \x01(\tR\x0fhardwareVersion\x12)\n" +
+	"\x10software_version\x18\x03 \x01(\tR\x0fsoftwareVersion\x12)\n" +
+	"\x10firmware_version\x18\x04 \x01(\tR\x0ffirmwareVersion\x12\x16\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\x1a\n" +
+	"\bchecksum\x18\x06 \x01(\tR\bchecksum2=\n" +
 	"\rDeviceService\x12,\n" +
 	"\aGetInfo\x12\r.device.Empty\x1a\x12.device.DeviceInfoB\x1fZ\x1dinternal/api/grpc/proto;protob\x06proto3"
 

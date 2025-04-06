@@ -12,8 +12,9 @@ message Empty {}
 
 message DeviceInfo {
   string id = 1;
-  string name = 2;
-  string hardware_version = 3;
-  string software_version = 4;
-  string firmware_version = 5;
+  string hardware_version = 2;
+  string software_version = 3;
+  string firmware_version = 4;
+  string status = 5;
+  string checksum = 6;
 }
