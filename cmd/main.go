@@ -9,14 +9,19 @@ import (
 	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/filestore"
 	"github.com/chlp/ui/pkg/logger"
+	"os"
 )
 
 const (
-	configFile = "config.json"
+	defaultConfigFile = "config.json"
 )
 
 func main() {
-	cfg := config.MustLoadOrCreateConfig(configFile)
+	configPath := defaultConfigFile
+	if len(os.Args) > 1 {
+		configPath = os.Args[1]
+	}
+	cfg := config.MustLoadOrCreateConfig(configPath)
 
 	app, appDone := application.NewApp(cfg.LogFile)
 

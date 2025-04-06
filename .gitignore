@@ -3,3 +3,7 @@
 /config.json
 /devices_list.json
 /monitor.json
+/ui_status_monitor_linux_amd64
+/ui_status_monitor_macos_amd64
+/ui_status_monitor_macos_arm64
+/ui_status_monitor_windows_amd64.exe
