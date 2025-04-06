@@ -33,6 +33,11 @@ func (m *MockStore) LoadJSON(v interface{}) error {
 		if ok {
 			*p = data
 		}
+	case []string:
+		p, ok := v.(*[]string)
+		if ok {
+			*p = data
+		}
 	default:
 		if p, ok := v.(*map[string]device.Status); ok {
 			*p = m.Data.(map[string]device.Status)
@@ -53,7 +58,7 @@ func (m *MockStore) SaveJSON(v interface{}) error {
 }
 
 func TestNewMonitor_Success(t *testing.T) {
-	app, _ := application.NewApp("", false)
+	app, _ := application.NewApp("app", "", false)
 	devicesListStore := &MockStore{Data: []string{"device1", "device2"}}
 	devicesStatusStore := &MockStore{Data: map[string]device.Status{}}
 
@@ -67,7 +72,7 @@ func TestNewMonitor_Success(t *testing.T) {
 }
 
 func TestMustNewMonitor_Success(t *testing.T) {
-	app, _ := application.NewApp("", false)
+	app, _ := application.NewApp("app", "", false)
 	devicesListStore := &MockStore{Data: []string{"device1", "device2"}}
 	devicesStatusStore := &MockStore{Data: map[string]device.Status{}}
 
@@ -78,7 +83,7 @@ func TestMustNewMonitor_Success(t *testing.T) {
 }
 
 func TestNewMonitor_NilStores(t *testing.T) {
-	app, _ := application.NewApp("", false)
+	app, _ := application.NewApp("app", "", false)
 
 	m, err := NewMonitor(app, nil, nil)
 	if err != nil {
@@ -90,7 +95,7 @@ func TestNewMonitor_NilStores(t *testing.T) {
 }
 
 func TestGetDevicesStatus(t *testing.T) {
-	app, _ := application.NewApp("", false)
+	app, _ := application.NewApp("app", "", false)
 	devicesListStore := &MockStore{Data: []string{"device1"}}
 	devicesStatusStore := &MockStore{Data: map[string]device.Status{
 		"device1": {
