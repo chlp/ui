@@ -29,6 +29,11 @@ func MustNewMonitor(app *application.App, devicesListStore, devicesStatusStore S
 
 func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store) (*Monitor, error) {
 	if devicesListStore != nil {
+		logger.Printf("Monitor: starting without monitor (no devicesListStore)")
+		return nil, nil
+	}
+	if devicesStatusStore != nil {
+		logger.Printf("Monitor: starting without monitor (no devicesStatusStore)")
 		return nil, nil
 	}
 
@@ -46,6 +51,9 @@ func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store
 	}
 	go m.watchDevicesListStoreChanges(app)
 
+	if err := m.loadPersistedDevicesStatus(); err != nil {
+		return nil, err
+	}
 	go m.pollAllDevicesStatus()
 
 	logger.Printf("Monitor: monitor started, devices in list: %d", len(m.devicesList))

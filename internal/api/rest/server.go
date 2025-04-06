@@ -12,8 +12,9 @@ type server struct {
 	monitor Monitor
 }
 
-func StartRestServer(app *application.App, port string, device *model.DeviceInfo, monitor Monitor) {
+func StartServer(app *application.App, port string, device *model.DeviceInfo, monitor Monitor) {
 	if port == "" {
+		logger.Printf("Rest::StartServer: starting without rest server")
 		return
 	}
 
@@ -39,10 +40,10 @@ func StartRestServer(app *application.App, port string, device *model.DeviceInfo
 		app.Wg.Done()
 	}()
 
-	logger.Printf("StartRestServer: starting server on %s", port)
+	logger.Printf("Rest::StartServer: starting server on %s", port)
 	if err := httpServer.ListenAndServe(); err != nil {
 		if err != http.ErrServerClosed {
-			logger.Fatalf("StartRestServer: failed to serve: %v", err)
+			logger.Fatalf("Rest::StartServer: failed to serve: %v", err)
 		}
 	}
 }

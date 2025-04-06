@@ -28,8 +28,8 @@ func main() {
 		filestore.NewFileStore(cfg.DevicesListFile),
 		filestore.NewFileStore(cfg.DevicesStatusFile),
 	)
-	go rest.StartRestServer(app, cfg.RestPort, device, devicesMonitor)
-	go grpc.StartGrpcServer(app, cfg.GrpcPort, device)
+	go rest.StartServer(app, cfg.RestPort, device, devicesMonitor)
+	go grpc.StartServer(app, cfg.GrpcPort, device)
 
 	<-appDone
 

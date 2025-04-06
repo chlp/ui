@@ -14,14 +14,15 @@ type server struct {
 	proto.UnimplementedDeviceServiceServer
 }
 
-func StartGrpcServer(app *application.App, port string, device *model.DeviceInfo) {
+func StartServer(app *application.App, port string, device *model.DeviceInfo) {
 	if port == "" {
+		logger.Printf("gRPC::StartServer: starting without gRPC server")
 		return
 	}
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		logger.Fatalf("failed to listen: %v", err)
+		logger.Fatalf("gRPC::StartServer: failed to listen: %v", err)
 		return
 	}
 	s := grpc.NewServer()
@@ -34,8 +35,8 @@ func StartGrpcServer(app *application.App, port string, device *model.DeviceInfo
 		app.Wg.Done()
 	}()
 
-	logger.Printf("StartGrpcServer: starting server on %s", port)
+	logger.Printf("gRPC::StartServer: starting server on %s", port)
 	if err = s.Serve(lis); err != nil {
-		logger.Fatalf("StartGrpcServer: failed to serve: %v", err)
+		logger.Fatalf("gRPC::StartServer: failed to serve: %v", err)
 	}
 }

@@ -22,7 +22,7 @@ func InitLogger(logFile string) {
 }
 
 func Printf(format string, args ...interface{}) {
-	fmt.Printf(format, args...)
+	fmt.Printf(format+"\n", args...)
 	if logger != nil {
 		logger.Printf(format, args...)
 	}

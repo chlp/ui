@@ -1,8 +1,10 @@
 package monitor
 
 import (
+	"errors"
 	"github.com/chlp/ui/internal/model"
 	"github.com/chlp/ui/pkg/logger"
+	"os"
 	"sync"
 	"time"
 )
@@ -11,6 +13,17 @@ const (
 	devicesStatusPollInterval = 5 * time.Second
 	maxParallelPolling        = 128
 )
+
+func (m *Monitor) loadPersistedDevicesStatus() error {
+	m.devicesStatusMu.Lock()
+	defer m.devicesStatusMu.Unlock()
+
+	err := m.devicesStatusStore.LoadJSON(&m.devicesStatus)
+	if errors.Is(err, os.ErrNotExist) {
+		return m.devicesStatusStore.SaveJSON(&m.devicesList)
+	}
+	return err
+}
 
 func (m *Monitor) pollAllDevicesStatus() {
 	ticker := time.NewTicker(devicesStatusPollInterval)
@@ -55,11 +68,12 @@ func (m *Monitor) pollDeviceStatus(address string) error {
 	}
 
 	m.devicesStatusMu.Lock()
+	defer m.devicesStatusMu.Unlock()
+
 	m.devicesStatus[address] = model.DeviceStatus{
 		DeviceInfo: *info,
 		UpdatedAt:  time.Now(),
 	}
-	m.devicesStatusMu.Unlock()
 
 	err = m.devicesStatusStore.SaveJSON(&m.devicesStatus)
 	if err != nil {
