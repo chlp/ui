@@ -1,4 +1,5 @@
 .idea
 /app.log
 /config.json
-/state.json
+/devices_list.json
+/monitor.json
