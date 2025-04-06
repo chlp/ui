@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"fmt"
 	"github.com/chlp/ui/internal/device"
 	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
@@ -28,6 +29,11 @@ func MustNewMonitor(app *application.App, devicesListStore, devicesStatusStore S
 }
 
 func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store) (*Monitor, error) {
+	if app == nil {
+		err := fmt.Errorf("could not start without app")
+		logger.Printf("Monitor: err %v", err)
+		return nil, err
+	}
 	if devicesListStore == nil {
 		logger.Printf("Monitor: starting without monitor (no devicesListStore)")
 		return nil, nil
