@@ -23,7 +23,7 @@ func main() {
 	}
 	cfg := config.MustLoadOrCreateConfig(configPath)
 
-	app, appDone := application.NewApp(cfg.LogFile)
+	app, appDone := application.NewApp(cfg.LogFile, cfg.Debug)
 
 	localDevice := device.GetLocalDevice(cfg.Device, cfg.ChecksumCmd, *cfg.ChecksumEmulate)
 

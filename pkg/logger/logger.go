@@ -7,8 +7,10 @@ import (
 )
 
 var logger *log.Logger
+var withDebug bool
 
-func InitLogger(logFile string) {
+func InitLogger(logFile string, debug bool) {
+	withDebug = debug
 	if logFile == "" {
 		// will use only stdout
 		return
@@ -19,6 +21,16 @@ func InitLogger(logFile string) {
 		panic(err)
 	}
 	logger = log.New(file, "", log.LstdFlags)
+}
+
+func Debugf(format string, args ...interface{}) {
+	if !withDebug {
+		return
+	}
+	fmt.Printf("Debug: "+format+"\n", args...)
+	if logger != nil {
+		logger.Printf("Debug: "+format, args...)
+	}
 }
 
 func Printf(format string, args ...interface{}) {

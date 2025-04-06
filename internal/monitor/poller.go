@@ -54,16 +54,16 @@ func (m *Monitor) pollAllDevicesStatus() {
 func (m *Monitor) pollDeviceStatus(address string) error {
 	info, err := getRestInfo(address)
 	if err != nil {
-		logger.Printf("Monitor::pollDevice: REST failed, trying gRPC (%s): %v", address, err)
+		logger.Debugf("Monitor::pollDevice: REST failed, trying gRPC (%s): %v", address, err)
 		info, err = getGrpcInfo(address)
 		if err != nil {
-			logger.Printf("Monitor::pollDevice: gRPC failed (%s): %v", address, err)
+			logger.Debugf("Monitor::pollDevice: gRPC failed (%s): %v", address, err)
 			return err
 		}
 	}
 
 	if info == nil {
-		logger.Printf("Monitor::pollDevice: empty info (%s)", address)
+		logger.Debugf("Monitor::pollDevice: empty info (%s)", address)
 		return nil
 	}
 

@@ -5,10 +5,16 @@ import (
 	"fmt"
 	"github.com/chlp/ui/internal/device"
 	"net/http"
+	"time"
 )
 
+const restClientTimeout = 2 * time.Second
+
 func getRestInfo(address string) (*device.Info, error) {
-	resp, err := http.Get(fmt.Sprintf("http://%s/info", address))
+	client := &http.Client{
+		Timeout: restClientTimeout,
+	}
+	resp, err := client.Get(fmt.Sprintf("http://%s/info", address))
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +24,7 @@ func getRestInfo(address string) (*device.Info, error) {
 		return nil, fmt.Errorf("bad status: %s", resp.Status)
 	}
 	var info device.Info
-	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&info); err != nil {
 		return nil, err
 	}
 	return &info, nil

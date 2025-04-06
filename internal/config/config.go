@@ -11,9 +11,10 @@ import (
 )
 
 type Config struct {
+	LogFile           string       `json:"log_file"`          // file where logs will be written
+	Debug             bool         `json:"debug"`             // write debug logs
 	DevicesListFile   string       `json:"devices_list_file"` // file with list of devices
 	DevicesStatusFile string       `json:"monitor_file"`      // file for persisting all polled data from devices
-	LogFile           string       `json:"log_file"`          // file where logs will be written
 	GrpcPort          string       `json:"grpc_port"`         // port to start gRPC server
 	RestPort          string       `json:"rest_port"`         // port to start REST server
 	Device            *device.Info `json:"device"`            // configuration if using the app as a monitored device

@@ -8,8 +8,10 @@ import (
 	"time"
 )
 
+const grpcClientTimeout = 2 * time.Second
+
 func getGrpcInfo(address string) (*device.Info, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), grpcClientTimeout)
 	defer cancel()
 	conn, err := grpc.DialContext(ctx, address, grpc.WithInsecure(), grpc.WithBlock()) // todo: deprecated
 	if err != nil {
@@ -28,5 +30,7 @@ func getGrpcInfo(address string) (*device.Info, error) {
 		HardwareVersion: resp.HardwareVersion,
 		SoftwareVersion: resp.SoftwareVersion,
 		FirmwareVersion: resp.FirmwareVersion,
+		Status:          device.StatusType(resp.Status),
+		Checksum:        resp.Checksum,
 	}, nil
 }
