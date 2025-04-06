@@ -3,12 +3,12 @@ package monitor
 import (
 	"context"
 	"github.com/chlp/ui/internal/api/grpc/proto"
-	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/internal/device"
 	"google.golang.org/grpc"
 	"time"
 )
 
-func getGrpcInfo(address string) (*model.DeviceInfo, error) {
+func getGrpcInfo(address string) (*device.Info, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	conn, err := grpc.DialContext(ctx, address, grpc.WithInsecure(), grpc.WithBlock()) // todo: deprecated
@@ -23,7 +23,7 @@ func getGrpcInfo(address string) (*model.DeviceInfo, error) {
 		return nil, err
 	}
 
-	return &model.DeviceInfo{
+	return &device.Info{
 		ID:              resp.Id,
 		HardwareVersion: resp.HardwareVersion,
 		SoftwareVersion: resp.SoftwareVersion,

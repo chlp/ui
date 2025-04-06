@@ -1,7 +1,7 @@
 package monitor
 
 import (
-	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/internal/device"
 	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"sync"
@@ -14,7 +14,7 @@ type Monitor struct {
 
 	devicesStatusStore Store
 
-	devicesStatus   map[string]model.DeviceStatus
+	devicesStatus   map[string]device.Status
 	devicesStatusMu sync.RWMutex
 }
 
@@ -42,7 +42,7 @@ func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store
 		devicesListStore:   devicesListStore,
 		devicesListMu:      sync.RWMutex{},
 		devicesStatusStore: devicesStatusStore,
-		devicesStatus:      make(map[string]model.DeviceStatus),
+		devicesStatus:      make(map[string]device.Status),
 		devicesStatusMu:    sync.RWMutex{},
 	}
 
@@ -60,11 +60,11 @@ func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store
 	return m, nil
 }
 
-func (m *Monitor) GetDevicesStatus() map[string]model.DeviceStatus {
+func (m *Monitor) GetDevicesStatus() map[string]device.Status {
 	m.devicesStatusMu.RLock()
 	defer m.devicesStatusMu.RUnlock()
 
-	devicesStatus := make(map[string]model.DeviceStatus, len(m.devicesStatus))
+	devicesStatus := make(map[string]device.Status, len(m.devicesStatus))
 	for k, v := range m.devicesStatus {
 		devicesStatus[k] = v
 	}

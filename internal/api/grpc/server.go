@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"github.com/chlp/ui/internal/api/grpc/proto"
-	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/internal/device"
 	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"google.golang.org/grpc"
@@ -10,11 +10,11 @@ import (
 )
 
 type server struct {
-	device *model.DeviceInfo
+	device *device.Info
 	proto.UnimplementedDeviceServiceServer
 }
 
-func StartServer(app *application.App, port string, device *model.DeviceInfo) {
+func StartServer(app *application.App, port string, device *device.Info) {
 	if port == "" {
 		logger.Printf("gRPC::StartServer: starting without gRPC server")
 		return

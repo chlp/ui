@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
-	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/internal/device"
 	"github.com/chlp/ui/pkg/filestore"
 	"github.com/chlp/ui/pkg/logger"
 	"os"
@@ -11,12 +11,14 @@ import (
 )
 
 type Config struct {
-	DevicesListFile   string            `json:"devices_list_file"` // file with list of devices
-	DevicesStatusFile string            `json:"monitor_file"`      // file for persisting all polled data from devices
-	LogFile           string            `json:"log_file"`          // file where logs will be written
-	GrpcPort          string            `json:"grpc_port"`         // port to start gRPC server
-	RestPort          string            `json:"rest_port"`         // port to start REST server
-	Device            *model.DeviceInfo `json:"device"`            // configuration if using the app as a monitored device
+	DevicesListFile   string       `json:"devices_list_file"` // file with list of devices
+	DevicesStatusFile string       `json:"monitor_file"`      // file for persisting all polled data from devices
+	LogFile           string       `json:"log_file"`          // file where logs will be written
+	GrpcPort          string       `json:"grpc_port"`         // port to start gRPC server
+	RestPort          string       `json:"rest_port"`         // port to start REST server
+	Device            *device.Info `json:"device"`            // configuration if using the app as a monitored device
+	ChecksumCmd       string       `json:"checksum_cmd"`      // command to calculate checksum
+	ChecksumEmulate   *bool        `json:"checksum_emulate"`  // emulate checksum if checksum cmd return empty string
 }
 
 const (
@@ -25,6 +27,7 @@ const (
 	defaultLogFile         = "app.log"
 	defaultGrpcPort        = ":50051"
 	defaultRestPort        = ":8080"
+	defaultChecksumEmulate = true
 )
 
 func MustLoadOrCreateConfig(configFile string) *Config {
@@ -38,13 +41,14 @@ func MustLoadOrCreateConfig(configFile string) *Config {
 
 func LoadOrCreateConfig(configFile string) (*Config, error) {
 	var cfg *Config
+	defaultChecksumEmulateVar := defaultChecksumEmulate
 	if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
-		deviceConfig := &model.DeviceInfo{
+		deviceConfig := &device.Info{
 			ID:              generateID(),
 			HardwareVersion: "0.0.1",
 			SoftwareVersion: "1.0.0",
 			FirmwareVersion: "0.0.5",
-			Status:          model.DeviceStatusOk,
+			Status:          device.StatusOk,
 			Checksum:        "",
 		}
 		cfg = &Config{
@@ -54,11 +58,16 @@ func LoadOrCreateConfig(configFile string) (*Config, error) {
 			GrpcPort:          defaultGrpcPort,
 			RestPort:          defaultRestPort,
 			Device:            deviceConfig,
+			ChecksumCmd:       "",
+			ChecksumEmulate:   &defaultChecksumEmulateVar,
 		}
 		return cfg, filestore.SaveJSON(configFile, cfg)
 	} else {
 		if err = filestore.LoadJSON(configFile, &cfg); err != nil {
 			return nil, err
+		}
+		if cfg.ChecksumEmulate == nil {
+			cfg.ChecksumEmulate = &defaultChecksumEmulateVar
 		}
 		return cfg, nil
 	}

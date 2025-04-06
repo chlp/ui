@@ -14,7 +14,9 @@ type App struct {
 	Wg  sync.WaitGroup
 }
 
-func NewApp() (*App, <-chan struct{}) {
+func NewApp(logFile string) (*App, <-chan struct{}) {
+	logger.InitLogger(logFile)
+
 	appCtx, appShutdown := context.WithCancel(context.Background())
 	app := &App{
 		Ctx: appCtx,

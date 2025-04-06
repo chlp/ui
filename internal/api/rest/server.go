@@ -1,18 +1,18 @@
 package rest
 
 import (
-	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/internal/device"
 	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"net/http"
 )
 
 type server struct {
-	device  *model.DeviceInfo
+	device  *device.Info
 	monitor Monitor
 }
 
-func StartServer(app *application.App, port string, device *model.DeviceInfo, monitor Monitor) {
+func StartServer(app *application.App, port string, device *device.Info, monitor Monitor) {
 	if port == "" {
 		logger.Printf("Rest::StartServer: starting without rest server")
 		return

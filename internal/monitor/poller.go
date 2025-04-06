@@ -2,7 +2,7 @@ package monitor
 
 import (
 	"errors"
-	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/internal/device"
 	"github.com/chlp/ui/pkg/logger"
 	"os"
 	"sync"
@@ -70,9 +70,9 @@ func (m *Monitor) pollDeviceStatus(address string) error {
 	m.devicesStatusMu.Lock()
 	defer m.devicesStatusMu.Unlock()
 
-	m.devicesStatus[address] = model.DeviceStatus{
-		DeviceInfo: *info,
-		UpdatedAt:  time.Now(),
+	m.devicesStatus[address] = device.Status{
+		Info:      *info,
+		UpdatedAt: time.Now(),
 	}
 
 	err = m.devicesStatusStore.SaveJSON(&m.devicesStatus)
