@@ -48,6 +48,7 @@ func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store
 
 	go m.pollAllDevicesStatus()
 
+	logger.Printf("Monitor: monitor started, devices in list: %d", len(m.devicesList))
 	return m, nil
 }
 

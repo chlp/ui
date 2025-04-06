@@ -1,10 +1,13 @@
 package monitor
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -31,6 +34,8 @@ func (m *Monitor) AddDevice(address string) (bool, error) {
 
 	m.devicesList = append(m.devicesList, address)
 
+	logger.Printf("Monitor::AddDevice: devices list changed: %d", len(m.devicesList))
+
 	if err := m.devicesListStore.SaveJSON(&m.devicesList); err != nil {
 		logger.Printf("Monitor::AddDevice: failed to save devices list: %v", err)
 		return false, err
@@ -41,6 +46,8 @@ func (m *Monitor) AddDevice(address string) (bool, error) {
 
 func (m *Monitor) RemoveDevice(address string) (bool, error) {
 	m.devicesListMu.Lock()
+	defer m.devicesListMu.Unlock()
+
 	listChanged := false
 	for i, device := range m.devicesList {
 		if device == address {
@@ -49,11 +56,12 @@ func (m *Monitor) RemoveDevice(address string) (bool, error) {
 			break
 		}
 	}
-	m.devicesListMu.Unlock()
 
 	if !listChanged {
 		return false, nil
 	}
+
+	logger.Printf("Monitor::RemoveDevice: devices list changed: %d", len(m.devicesList))
 
 	if err := m.devicesListStore.SaveJSON(&m.devicesList); err != nil {
 		logger.Printf("Monitor::RemoveDevice: failed to save devices list: %v", err)
@@ -67,8 +75,14 @@ func (m *Monitor) syncDevicesListWithStore() error {
 	m.devicesListMu.Lock()
 	defer m.devicesListMu.Unlock()
 
+	hashBeforeChanges := m.devicesListHash()
+
+	m.devicesList = m.devicesList[:0]
 	err := m.devicesListStore.LoadJSON(&m.devicesList)
 	if err == nil {
+		if hashBeforeChanges != m.devicesListHash() {
+			logger.Printf("Monitor::syncDevicesListWithStore: devices list changed: %d", len(m.devicesList))
+		}
 		return nil
 	}
 
@@ -95,4 +109,10 @@ func (m *Monitor) watchDevicesListStoreChanges(app *application.App) {
 			}
 		}
 	}
+}
+
+func (m *Monitor) devicesListHash() string {
+	joined := strings.Join(m.devicesList, ",")
+	hash := sha256.Sum256([]byte(joined))
+	return hex.EncodeToString(hash[:])
 }
