@@ -77,7 +77,6 @@ func (m *Monitor) syncDevicesListWithStore() error {
 
 	hashBeforeChanges := m.devicesListHash()
 
-	m.devicesList = m.devicesList[:0]
 	err := m.devicesListStore.LoadJSON(&m.devicesList)
 	if err == nil {
 		if hashBeforeChanges != m.devicesListHash() {
