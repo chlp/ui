@@ -78,7 +78,7 @@ func (m *Monitor) GetDevicesStatus() map[string]device.Status {
 
 	devicesStatus := make(map[string]device.Status, len(m.devicesList))
 	for _, addr := range m.devicesList {
-		if deviceStatus, ok := devicesStatus[addr]; ok {
+		if deviceStatus, ok := m.devicesStatus[addr]; ok {
 			if deviceStatus.UpdatedAt.Before(time.Now().Add(-durationToSetDeviceUnavailable)) {
 				deviceStatus.Status = device.StatusUnavailable
 			}
