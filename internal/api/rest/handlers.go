@@ -12,6 +12,8 @@ func (s *server) getInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	setContentTypeJson(w)
+
 	if err := json.NewEncoder(w).Encode(s.device); err != nil {
 		logger.Printf("Rest::getInfo: failed to marshal: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -26,6 +28,8 @@ func (s *server) getDevicesStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	setContentTypeJson(w)
+
 	if err := json.NewEncoder(w).Encode(s.monitor.GetDevicesStatus()); err != nil {
 		logger.Printf("Rest::getDevicesStatus: failed to marshal: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -39,6 +43,8 @@ func (s *server) getDevicesList(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
+
+	setContentTypeJson(w)
 
 	if err := json.NewEncoder(w).Encode(s.monitor.GetDevicesList()); err != nil {
 		logger.Printf("Rest::getDevicesList: failed to marshal: %v", err)
@@ -62,6 +68,8 @@ func (s *server) addDevice(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	setContentTypeJson(w)
 
 	logger.Printf("Rest::addDevice: %s", payload.Address)
 
@@ -93,6 +101,8 @@ func (s *server) removeDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	setContentTypeJson(w)
+
 	logger.Printf("Rest::removeDevice: %s", payload.Address)
 
 	deleted, err := s.monitor.RemoveDevice(payload.Address)
@@ -106,4 +116,8 @@ func (s *server) removeDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func setContentTypeJson(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
 }
