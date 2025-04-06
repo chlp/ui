@@ -1,0 +1,17 @@
+{
+  "devices_list_file": "",
+  "monitor_file": "",
+  "log_file": "app.log",
+  "grpc_port": "",
+  "rest_port": ":8084",
+  "device": {
+    "id": "4_rest_fail_device",
+    "hardware_version": "0.1.0",
+    "software_version": "1.0.0",
+    "firmware_version": "0.3.5",
+    "status": "fail",
+    "checksum": ""
+  },
+  "checksum_cmd": "echo echo8817237test",
+  "checksum_emulate": false
+}

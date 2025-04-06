@@ -7,3 +7,10 @@
 /ui_status_monitor_macos_amd64
 /ui_status_monitor_macos_arm64
 /ui_status_monitor_windows_amd64.exe
+/scenarios/6_rest_device_close_in_30sec/app.log
+/scenarios/5_rest_warning_device/app.log
+/scenarios/4_rest_fail_device/app.log
+/scenarios/3_rest_device/app.log
+/scenarios/2_grpc_device/app.log
+/scenarios/1_monitor/monitor.json
+/scenarios/1_monitor/app.log

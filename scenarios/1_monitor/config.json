@@ -1,0 +1,17 @@
+{
+  "devices_list_file": "devices_list.json",
+  "monitor_file": "monitor.json",
+  "log_file": "app.log",
+  "grpc_port": ":50051",
+  "rest_port": ":8080",
+  "checksum_cmd": "echo 12",
+  "checksum_emulate": true,
+  "device": {
+    "id": "1_monitor",
+    "hardware_version": "0.0.1",
+    "software_version": "1.0.0",
+    "firmware_version": "0.0.5",
+    "status": "ok",
+    "checksum": ""
+  }
+}

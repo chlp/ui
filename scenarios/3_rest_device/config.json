@@ -1,0 +1,17 @@
+{
+  "devices_list_file": "",
+  "monitor_file": "",
+  "log_file": "app.log",
+  "grpc_port": "",
+  "rest_port": ":8083",
+  "device": {
+    "id": "3_rest_device",
+    "hardware_version": "0.1.1",
+    "software_version": "1.2.0",
+    "firmware_version": "0.3.5",
+    "status": "ok",
+    "checksum": ""
+  },
+  "checksum_cmd": "",
+  "checksum_emulate": true
+}
