@@ -14,7 +14,7 @@ func getRestInfo(address string) (*device.Info, error) {
 	client := &http.Client{
 		Timeout: restClientTimeout,
 	}
-	resp, err := client.Get(fmt.Sprintf("http://%s/info", address))
+	resp, err := client.Get(fmt.Sprintf("http://%s/v1/info", address))
 	if err != nil {
 		return nil, err
 	}

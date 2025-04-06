@@ -7,7 +7,10 @@ import (
 	"github.com/chlp/ui/pkg/logger"
 	"reflect"
 	"sync"
+	"time"
 )
+
+const durationToSetDeviceUnavailable = 15 * time.Second
 
 type Monitor struct {
 	devicesList      []string
@@ -61,7 +64,7 @@ func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store
 	if err := m.loadPersistedDevicesStatus(); err != nil {
 		return nil, err
 	}
-	go m.pollAllDevicesStatus()
+	go m.pollAllDevicesStatus(app)
 
 	logger.Printf("Monitor: monitor started, devices in list: %d", len(m.devicesList))
 	return m, nil
@@ -70,10 +73,25 @@ func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store
 func (m *Monitor) GetDevicesStatus() map[string]device.Status {
 	m.devicesStatusMu.RLock()
 	defer m.devicesStatusMu.RUnlock()
+	m.devicesListMu.RLock()
+	defer m.devicesListMu.RUnlock()
 
 	devicesStatus := make(map[string]device.Status, len(m.devicesStatus))
 	for k, v := range m.devicesStatus {
+		if v.UpdatedAt.Before(time.Now().Add(-durationToSetDeviceUnavailable)) {
+			v.Status = device.StatusUnavailable
+		}
 		devicesStatus[k] = v
+	}
+	for _, v := range m.devicesList {
+		if _, ok := devicesStatus[v]; !ok {
+			devicesStatus[v] = device.Status{
+				Info: device.Info{
+					Status: device.StatusUnknown,
+				},
+				UpdatedAt: time.Time{},
+			}
+		}
 	}
 	return devicesStatus
 }

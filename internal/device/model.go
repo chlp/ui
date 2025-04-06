@@ -5,10 +5,11 @@ import "time"
 type StatusType string
 
 const (
-	StatusUnknown StatusType = "unknown"
-	StatusOk      StatusType = "ok"
-	StatusWarning StatusType = "warning"
-	StatusFatal   StatusType = "fatal"
+	StatusUnknown     StatusType = "unknown"
+	StatusOk          StatusType = "ok"
+	StatusWarning     StatusType = "warning"
+	StatusFatal       StatusType = "fatal"
+	StatusUnavailable StatusType = "unavailable"
 )
 
 type Info struct {
@@ -22,5 +23,5 @@ type Info struct {
 
 type Status struct {
 	Info
-	UpdatedAt time.Time `json:"last_success"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

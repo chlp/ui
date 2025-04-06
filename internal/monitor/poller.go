@@ -3,6 +3,7 @@ package monitor
 import (
 	"errors"
 	"github.com/chlp/ui/internal/device"
+	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"os"
 	"sync"
@@ -25,45 +26,59 @@ func (m *Monitor) loadPersistedDevicesStatus() error {
 	return err
 }
 
-func (m *Monitor) pollAllDevicesStatus() {
+func (m *Monitor) pollAllDevicesStatus(app *application.App) {
+	app.Wg.Add(1)
+	defer app.Wg.Done()
+
+	m.pollAllDevicesStatusOnce()
+
 	ticker := time.NewTicker(devicesStatusPollInterval)
 	defer ticker.Stop()
-	for range ticker.C {
-		devicesList := m.GetDevicesList()
-
-		wg := sync.WaitGroup{}
-		goRoutinesLimiterChan := make(chan struct{}, maxParallelPolling)
-
-		for _, address := range devicesList {
-			wg.Add(1)
-			goRoutinesLimiterChan <- struct{}{}
-			go func() {
-				defer wg.Done()
-				defer func() { <-goRoutinesLimiterChan }()
-
-				if err := m.pollDeviceStatus(address); err != nil {
-					logger.Debugf("Monitor::pollAllDevicesStatus: pollDeviceStatus err (%s): %v", address, err)
-				}
-			}()
+	for {
+		select {
+		case <-app.Ctx.Done():
+			return
+		case <-ticker.C:
+			m.pollAllDevicesStatusOnce()
 		}
-
-		wg.Wait()
 	}
+}
+
+func (m *Monitor) pollAllDevicesStatusOnce() {
+	devicesList := m.GetDevicesList()
+
+	wg := sync.WaitGroup{}
+	goRoutinesLimiterChan := make(chan struct{}, maxParallelPolling)
+
+	for _, address := range devicesList {
+		wg.Add(1)
+		goRoutinesLimiterChan <- struct{}{}
+		go func(address string) {
+			defer wg.Done()
+			defer func() { <-goRoutinesLimiterChan }()
+
+			if err := m.pollDeviceStatus(address); err != nil {
+				logger.Debugf("Monitor::pollAllDevicesStatus: pollDeviceStatus err (%s): %v", address, err)
+			}
+		}(address)
+	}
+
+	wg.Wait()
 }
 
 func (m *Monitor) pollDeviceStatus(address string) error {
 	info, err := getRestInfo(address)
 	if err != nil {
-		logger.Debugf("Monitor::pollDevice: REST failed, trying gRPC (%s): %v", address, err)
+		logger.Debugf("Monitor::pollDeviceStatus: REST failed, trying gRPC (%s): %v", address, err)
 		info, err = getGrpcInfo(address)
 		if err != nil {
-			logger.Debugf("Monitor::pollDevice: gRPC failed (%s): %v", address, err)
+			logger.Debugf("Monitor::pollDeviceStatus: gRPC failed (%s): %v", address, err)
 			return err
 		}
 	}
 
 	if info == nil {
-		logger.Debugf("Monitor::pollDevice: empty info (%s)", address)
+		logger.Debugf("Monitor::pollDeviceStatus: empty info (%s)", address)
 		return nil
 	}
 
@@ -77,7 +92,7 @@ func (m *Monitor) pollDeviceStatus(address string) error {
 
 	err = m.devicesStatusStore.SaveJSON(&m.devicesStatus)
 	if err != nil {
-		logger.Printf("Monitor::pollDevice: devicesStatusStore.SaveJSON (%s): %v", address, err)
+		logger.Printf("Monitor::pollDeviceStatus: devicesStatusStore.SaveJSON (%s): %v", address, err)
 		return err
 	}
 
