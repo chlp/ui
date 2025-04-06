@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"sync"
 )
@@ -17,8 +18,8 @@ type Monitor struct {
 	devicesStatusMu sync.RWMutex
 }
 
-func MustNewMonitor(devicesListStore, devicesStatusStore Store) *Monitor {
-	if m, err := NewMonitor(devicesListStore, devicesStatusStore); err != nil {
+func MustNewMonitor(app *application.App, devicesListStore, devicesStatusStore Store) *Monitor {
+	if m, err := NewMonitor(app, devicesListStore, devicesStatusStore); err != nil {
 		logger.Fatalf("MustNewMonitor: failed to load devicesList: %v", err)
 		return nil
 	} else {
@@ -26,7 +27,7 @@ func MustNewMonitor(devicesListStore, devicesStatusStore Store) *Monitor {
 	}
 }
 
-func NewMonitor(devicesListStore, devicesStatusStore Store) (*Monitor, error) {
+func NewMonitor(app *application.App, devicesListStore, devicesStatusStore Store) (*Monitor, error) {
 	if devicesListStore != nil {
 		return nil, nil
 	}
@@ -43,7 +44,7 @@ func NewMonitor(devicesListStore, devicesStatusStore Store) (*Monitor, error) {
 	if err := m.syncDevicesListWithStore(); err != nil {
 		return nil, err
 	}
-	go m.watchDevicesListStoreChanges()
+	go m.watchDevicesListStoreChanges(app)
 
 	go m.pollAllDevicesStatus()
 

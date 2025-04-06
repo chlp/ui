@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"errors"
+	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"os"
 	"time"
@@ -78,12 +79,20 @@ func (m *Monitor) syncDevicesListWithStore() error {
 	return err
 }
 
-func (m *Monitor) watchDevicesListStoreChanges() {
+func (m *Monitor) watchDevicesListStoreChanges(app *application.App) {
+	app.Wg.Add(1)
+	defer app.Wg.Done()
+
 	ticker := time.NewTicker(devicesListFileWatchInterval)
 	defer ticker.Stop()
-	for range ticker.C {
-		if err := m.syncDevicesListWithStore(); err != nil {
-			logger.Printf("Monitor::watchDevicesfailed: syncDevicesListWithStore err: %v", err)
+	for {
+		select {
+		case <-app.Ctx.Done():
+			return
+		case <-ticker.C:
+			if err := m.syncDevicesListWithStore(); err != nil {
+				logger.Printf("Monitor::watchDevicesListStoreChanges: syncDevicesListWithStore err: %v", err)
+			}
 		}
 	}
 }

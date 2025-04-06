@@ -3,6 +3,7 @@ package grpc
 import (
 	"github.com/chlp/ui/internal/api/grpc/proto"
 	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"google.golang.org/grpc"
 	"net"
@@ -13,7 +14,7 @@ type server struct {
 	proto.UnimplementedDeviceServiceServer
 }
 
-func StartGrpcServer(port string, device *model.DeviceInfo) {
+func StartGrpcServer(app *application.App, port string, device *model.DeviceInfo) {
 	if port == "" {
 		return
 	}
@@ -26,8 +27,15 @@ func StartGrpcServer(port string, device *model.DeviceInfo) {
 	s := grpc.NewServer()
 	proto.RegisterDeviceServiceServer(s, &server{device: device})
 
+	app.Wg.Add(1)
+	go func() {
+		<-app.Ctx.Done()
+		s.GracefulStop()
+		app.Wg.Done()
+	}()
+
 	logger.Printf("StartGrpcServer: starting server on %s", port)
-	if err := s.Serve(lis); err != nil {
+	if err = s.Serve(lis); err != nil {
 		logger.Fatalf("StartGrpcServer: failed to serve: %v", err)
 	}
 }

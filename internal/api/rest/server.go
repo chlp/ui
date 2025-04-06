@@ -2,6 +2,7 @@ package rest
 
 import (
 	"github.com/chlp/ui/internal/model"
+	"github.com/chlp/ui/pkg/application"
 	"github.com/chlp/ui/pkg/logger"
 	"net/http"
 )
@@ -11,7 +12,7 @@ type server struct {
 	monitor Monitor
 }
 
-func StartRestServer(port string, device *model.DeviceInfo, monitor Monitor) {
+func StartRestServer(app *application.App, port string, device *model.DeviceInfo, monitor Monitor) {
 	if port == "" {
 		return
 	}
@@ -30,8 +31,18 @@ func StartRestServer(port string, device *model.DeviceInfo, monitor Monitor) {
 		http.HandleFunc("/v1/remove_device", s.removeDevice)
 	}
 
+	httpServer := &http.Server{Addr: port, Handler: nil}
+	app.Wg.Add(1)
+	go func() {
+		<-app.Ctx.Done()
+		_ = httpServer.Close()
+		app.Wg.Done()
+	}()
+
 	logger.Printf("StartRestServer: starting server on %s", port)
-	if err := http.ListenAndServe(port, nil); err != nil {
-		logger.Fatalf("StartRestServer: failed to serve: %v", err)
+	if err := httpServer.ListenAndServe(); err != nil {
+		if err != http.ErrServerClosed {
+			logger.Fatalf("StartRestServer: failed to serve: %v", err)
+		}
 	}
 }

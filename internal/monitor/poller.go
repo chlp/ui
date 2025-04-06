@@ -19,14 +19,14 @@ func (m *Monitor) pollAllDevicesStatus() {
 		devicesList := m.GetDevicesList()
 
 		wg := sync.WaitGroup{}
-		semaphore := make(chan struct{}, maxParallelPolling)
+		goRoutinesLimiterChan := make(chan struct{}, maxParallelPolling)
 
 		for _, address := range devicesList {
 			wg.Add(1)
-			semaphore <- struct{}{}
+			goRoutinesLimiterChan <- struct{}{}
 			go func() {
 				defer wg.Done()
-				defer func() { <-semaphore }()
+				defer func() { <-goRoutinesLimiterChan }()
 
 				if err := m.pollDeviceStatus(address); err != nil {
 					logger.Printf("Monitor::pollAllDevicesStatus: pollDeviceStatus err (%s): %v", address, err)
