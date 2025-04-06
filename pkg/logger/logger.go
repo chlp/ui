@@ -6,16 +6,20 @@ import (
 	"os"
 )
 
-var logger *log.Logger
-var withDebug bool
+var (
+	appName   string
+	logger    *log.Logger
+	withDebug bool
+)
 
-func InitLogger(logFile string, debug bool) {
+func InitLogger(name, logFile string, debug bool) {
+	appName = name
 	withDebug = debug
+
 	if logFile == "" {
 		// will use only stdout
 		return
 	}
-
 	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
@@ -27,13 +31,20 @@ func Debugf(format string, args ...interface{}) {
 	if !withDebug {
 		return
 	}
-	fmt.Printf("Debug: "+format+"\n", args...)
+	format = "[debug] " + format
+	if appName != "" {
+		format = appName + " | " + format
+	}
+	fmt.Printf(format+"\n", args...)
 	if logger != nil {
-		logger.Printf("Debug: "+format, args...)
+		logger.Printf(format, args...)
 	}
 }
 
 func Printf(format string, args ...interface{}) {
+	if appName != "" {
+		format = appName + " | " + format
+	}
 	fmt.Printf(format+"\n", args...)
 	if logger != nil {
 		logger.Printf(format, args...)
@@ -41,7 +52,11 @@ func Printf(format string, args ...interface{}) {
 }
 
 func Fatalf(format string, args ...interface{}) {
-	Printf("Fatal: "+format, args...)
+	format = "[fatal] " + format
+	if appName != "" {
+		format = appName + " | " + format
+	}
+	Printf(format, args...)
 	if logger != nil {
 		logger.Fatalf(format, args...)
 	}

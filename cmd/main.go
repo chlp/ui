@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	defaultAppName    = "ui-monitor"
 	defaultConfigFile = "config.json"
 )
 
@@ -23,7 +24,12 @@ func main() {
 	}
 	cfg := config.MustLoadOrCreateConfig(configPath)
 
-	app, appDone := application.NewApp(cfg.LogFile, cfg.Debug)
+	appName := defaultAppName
+	if cfg.Device.ID != "" {
+		appName = cfg.Device.ID
+	}
+
+	app, appDone := application.NewApp(appName, cfg.LogFile, cfg.Debug)
 
 	localDevice := device.GetLocalDevice(cfg.Device, cfg.ChecksumCmd, *cfg.ChecksumEmulate)
 

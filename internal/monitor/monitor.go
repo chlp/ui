@@ -76,16 +76,15 @@ func (m *Monitor) GetDevicesStatus() map[string]device.Status {
 	m.devicesListMu.RLock()
 	defer m.devicesListMu.RUnlock()
 
-	devicesStatus := make(map[string]device.Status, len(m.devicesStatus))
-	for k, v := range m.devicesStatus {
-		if v.UpdatedAt.Before(time.Now().Add(-durationToSetDeviceUnavailable)) {
-			v.Status = device.StatusUnavailable
-		}
-		devicesStatus[k] = v
-	}
-	for _, v := range m.devicesList {
-		if _, ok := devicesStatus[v]; !ok {
-			devicesStatus[v] = device.Status{
+	devicesStatus := make(map[string]device.Status, len(m.devicesList))
+	for _, addr := range m.devicesList {
+		if deviceStatus, ok := devicesStatus[addr]; ok {
+			if deviceStatus.UpdatedAt.Before(time.Now().Add(-durationToSetDeviceUnavailable)) {
+				deviceStatus.Status = device.StatusUnavailable
+			}
+			devicesStatus[addr] = deviceStatus
+		} else {
+			devicesStatus[addr] = device.Status{
 				Info: device.Info{
 					Status: device.StatusUnknown,
 				},
