@@ -1,0 +1,135 @@
+openapi: 3.0.3
+info:
+  title: Device Monitor API
+  version: "1.0"
+  description: API for managing devices and retrieving device/server information
+
+paths:
+  /v1/info:
+    get:
+      summary: Get server or device information
+      responses:
+        '200':
+          description: Successfully retrieved server information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceInfo'
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Internal Server Error
+
+  /v1/devices_status:
+    get:
+      summary: Get statuses of all devices
+      responses:
+        '200':
+          description: Successfully retrieved device statuses
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/DeviceStatus'
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Internal Server Error
+
+  /v1/devices:
+    get:
+      summary: Get list of all devices
+      responses:
+        '200':
+          description: Successfully retrieved devices list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Internal Server Error
+
+  /v1/device:
+    post:
+      summary: Add a new device to list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceAddress'
+      responses:
+        '204':
+          description: Device already existed (no action taken)
+        '200':
+          description: Device added successfully
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+    delete:
+      summary: Remove a device from list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceAddress'
+      responses:
+        '204':
+          description: Device not found (no action taken)
+        '200':
+          description: Device removed successfully
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    DeviceInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the device
+        hardware_version:
+          type: string
+          description: Hardware version of the device
+        software_version:
+          type: string
+          description: Software version of the device
+        firmware_version:
+          type: string
+          description: Firmware version of the device
+        status:
+          type: string
+          description: Current status of the device
+        checksum:
+          type: string
+          description: Checksum
+
+    DeviceStatus:
+      allOf:
+        - $ref: '#/components/schemas/DeviceInfo'
+        - type: object
+          properties:
+            last_success:
+              type: string
+              format: date-time
+              description: Timestamp of the last successful communication with the device
+
+    DeviceAddress:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          type: string
+          description: IP address or identifier of the device

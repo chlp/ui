@@ -20,7 +20,7 @@ func (m *Monitor) loadPersistedDevicesStatus() error {
 
 	err := m.devicesStatusStore.LoadJSON(&m.devicesStatus)
 	if errors.Is(err, os.ErrNotExist) {
-		return m.devicesStatusStore.SaveJSON(&m.devicesList)
+		return m.devicesStatusStore.SaveJSON(&m.devicesStatus)
 	}
 	return err
 }

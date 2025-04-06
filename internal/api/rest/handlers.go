@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (s *server) getInfo(w http.ResponseWriter, r *http.Request) {
+func (s *server) getInfoHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -14,7 +14,7 @@ func (s *server) getInfo(w http.ResponseWriter, r *http.Request) {
 
 	data, err := json.Marshal(s.device)
 	if err != nil {
-		logger.Printf("Rest::getInfo: failed to marshal: %v", err)
+		logger.Printf("Rest::getInfoHandler: failed to marshal: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -24,7 +24,7 @@ func (s *server) getInfo(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func (s *server) getDevicesStatus(w http.ResponseWriter, r *http.Request) {
+func (s *server) getDevicesStatusHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -32,7 +32,7 @@ func (s *server) getDevicesStatus(w http.ResponseWriter, r *http.Request) {
 
 	data, err := json.Marshal(s.monitor.GetDevicesStatus())
 	if err != nil {
-		logger.Printf("Rest::getDevicesStatus: failed to marshal: %v", err)
+		logger.Printf("Rest::getDevicesStatusHandler: failed to marshal: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -42,7 +42,7 @@ func (s *server) getDevicesStatus(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func (s *server) getDevicesList(w http.ResponseWriter, r *http.Request) {
+func (s *server) getDevicesListHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -50,7 +50,7 @@ func (s *server) getDevicesList(w http.ResponseWriter, r *http.Request) {
 
 	data, err := json.Marshal(s.monitor.GetDevicesList())
 	if err != nil {
-		logger.Printf("Rest::getDevicesList: failed to marshal: %v", err)
+		logger.Printf("Rest::getDevicesListHandler: failed to marshal: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -60,12 +60,19 @@ func (s *server) getDevicesList(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func (s *server) addDevice(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+func (s *server) deviceHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		s.addDevice(w, r)
+		return
+	case http.MethodDelete:
+		s.removeDevice(w, r)
 		return
 	}
+	w.WriteHeader(http.StatusMethodNotAllowed)
+}
 
+func (s *server) addDevice(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		Address string `json:"address"`
 	}
@@ -94,11 +101,6 @@ func (s *server) addDevice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) removeDevice(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	var payload struct {
 		Address string `json:"address"`
 	}

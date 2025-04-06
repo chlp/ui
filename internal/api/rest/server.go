@@ -23,16 +23,19 @@ func StartServer(app *application.App, port string, device *model.DeviceInfo, mo
 		monitor: monitor,
 	}
 
-	http.HandleFunc("/v1/info", s.getInfo)
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/v1/info", s.getInfoHandler)
 
 	if s.monitor != nil {
-		http.HandleFunc("/v1/devices_status", s.getDevicesStatus)
-		http.HandleFunc("/v1/devices_list", s.getDevicesList)
-		http.HandleFunc("/v1/add_device", s.addDevice)
-		http.HandleFunc("/v1/remove_device", s.removeDevice)
+		mux.HandleFunc("/v1/devices_status", s.getDevicesStatusHandler)
+		mux.HandleFunc("/v1/devices", s.getDevicesListHandler)
+		mux.HandleFunc("/v1/device", s.deviceHandler)
 	}
 
-	httpServer := &http.Server{Addr: port, Handler: nil}
+	serveSwaggerFiles(mux)
+
+	httpServer := &http.Server{Addr: port, Handler: mux}
 	app.Wg.Add(1)
 	go func() {
 		<-app.Ctx.Done()
