@@ -22,9 +22,9 @@ clean:
 	rm -f $(APP_NAME) $(APP_NAME)_*
 
 docker-build:
-	docker build -t myapp .
+	docker build -t ui_monitor .
 
 docker-run:
-	docker run --rm -p 8080:8080 myapp
+	docker run --rm -p 8080:8080 ui_monitor
 
 docker: docker-build docker-run

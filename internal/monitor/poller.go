@@ -42,7 +42,7 @@ func (m *Monitor) pollAllDevicesStatus() {
 				defer func() { <-goRoutinesLimiterChan }()
 
 				if err := m.pollDeviceStatus(address); err != nil {
-					logger.Printf("Monitor::pollAllDevicesStatus: pollDeviceStatus err (%s): %v", address, err)
+					logger.Debugf("Monitor::pollAllDevicesStatus: pollDeviceStatus err (%s): %v", address, err)
 				}
 			}()
 		}
