@@ -26,7 +26,7 @@
 
 ## Deployment Options
 
-1. Download a ready-to-use binary for your platform.
+1. Download a ready-to-use binary for your platform - https://github.com/chlp/ui/releases/tag/v0.0.1.
 2. Build the application manually: see the `Makefile` or run `make build-all`.
 3. Run via Docker: execute `make docker`.
 
